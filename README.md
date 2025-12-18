@@ -1,40 +1,84 @@
-Below are the steps to get your plugin running. You can also find instructions at:
+# Expense to Figma Plugin
 
-  https://www.figma.com/plugin-docs/plugin-quickstart-guide/
+![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue?style=for-the-badge&logo=typescript) ![Figma API](https://img.shields.io/badge/Figma_API-1.0-F24E1E?style=for-the-badge&logo=figma&logoColor=white) ![Node](https://img.shields.io/badge/Node.js-16%2B-green?style=for-the-badge&logo=node.js) ![License](https://img.shields.io/badge/License-MIT-grey?style=for-the-badge)
 
-This plugin template uses Typescript and NPM, two standard tools in creating JavaScript applications.
+> **A TypeScript-based workflow automation tool designed to accelerate high-fidelity fintech prototyping by programmatically injecting dynamic transaction data into the Figma canvas.**
 
-First, download Node.js which comes with NPM. This will allow you to install TypeScript and other
-libraries. You can find the download link here:
+---
 
-  https://nodejs.org/en/download/
+## 📋 Executive Summary
 
-Next, install TypeScript using the command:
+**Expense to Figma** addresses a critical bottleneck in the UI/UX design process: the manual population of mock data. By leveraging the Figma Plugin API and TypeScript, this tool enables designers to generate context-aware financial data entities (merchants, amounts, formatting) instantly. 
 
-  npm install -g typescript
+This project demonstrates a mastery of **asynchronous JavaScript**, **strict type safety**, and **plugin architecture best practices**.
 
-Finally, in the directory of your plugin, get the latest type definitions for the plugin API by running:
+---
 
-  npm install --save-dev @figma/plugin-typings
+## ⚡ Key Features
 
-If you are familiar with JavaScript, TypeScript will look very familiar. In fact, valid JavaScript code
-is already valid Typescript code.
+* **Algorithmic Data Generation:** specific logic to randomize merchants and currency values within realistic bounds.
+* **Context-Aware Positioning:** Automatically detects the user's viewport center coordinates to instantiate layers exactly where the designer is focused.
+* **Asynchronous Resource Management:** Handles the Figma font-loading promise chain to ensure zero render-blocking or race conditions.
+* **Strict Typing:** Built entirely in TypeScript to ensure code reliability and maintainability.
 
-TypeScript adds type annotations to variables. This allows code editors such as Visual Studio Code
-to provide information about the Figma API while you are writing code, as well as help catch bugs
-you previously didn't notice.
+---
 
-For more information, visit https://www.typescriptlang.org/
+## 🏗 Technical Architecture
 
-Using TypeScript requires a compiler to convert TypeScript (code.ts) into JavaScript (code.js)
-for the browser to run.
+The application is architected around Figma's security sandbox model, utilizing a dual-thread system to ensure performance and isolation.
 
-We recommend writing TypeScript code using Visual Studio code:
+### 1. Dual-Thread Communication (IPC)
+The plugin operates on two distinct threads:
+* **The UI Thread (Iframe):** Renders the frontend interface (HTML/CSS) and captures user intent.
+* **The Main Thread (Sandbox):** Executes the business logic and directly manipulates the Figma document object model (DOM).
 
-1. Download Visual Studio Code if you haven't already: https://code.visualstudio.com/.
-2. Open this directory in Visual Studio Code.
-3. Compile TypeScript to JavaScript: Run the "Terminal > Run Build Task..." menu item,
-    then select "npm: watch". You will have to do this again every time
-    you reopen Visual Studio Code.
+Communication between these threads is handled via a secure **Inter-Process Communication (IPC)** bridge using the `postMessage` API, ensuring strictly typed payloads are passed efficiently.
 
-That's it! Visual Studio Code will regenerate the JavaScript file every time you save.
+### 2. Asynchronous Logic & Event Loop
+Figma's engine requires fonts to be loaded into the buffer before text manipulation can occur. This project implements an `async/await` pattern to lock execution until resources are resolved.
+
+```typescript
+// Example of Asynchronous Font Locking implementation
+figma.ui.onmessage = async (msg) => {
+  if (msg.type === 'create-expense') {
+    // Await promise resolution for font resources
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+    
+    // DOM manipulation occurs only after resource availability is guaranteed
+    const textNode = figma.createText();
+    textNode.characters = generatedData;
+  }
+};
+```
+🚀 Installation & Local Development
+This project uses standard Node.js tooling.
+
+### 1.Clone the repository
+``` bash
+git clone [https://github.com/YOUR_USERNAME/expense-to-figma.git](https://github.com/YOUR_USERNAME/expense-to-figma.git)
+cd expense-to-figma
+```
+
+### 2. Install Dependencies
+``` bash
+npm install
+```
+### 3. Build the Bundle Uses Webpack to transpile TypeScript into ES6 JavaScript.
+``` bash
+npm run build
+```
+
+### 4.Load into Figma
+
+*Open Figma Desktop App.
+
+*Navigate to Plugins > Development > Import plugin from manifest...
+
+*Select the manifest.json file located in the root directory.
+
+## 🔮 Roadmap & Optimization
+API Integration: Refactor data generation to fetch live exchange rates via an external REST API.
+
+UI State Management: Implement state retention for user preferences (e.g., currency selection).
+
+Unit Testing: Implement Jest for testing utility functions.
