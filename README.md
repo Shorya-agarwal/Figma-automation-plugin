@@ -70,15 +70,11 @@ npm run build
 
 ### 4.Load into Figma
 
-*Open Figma Desktop App.
-
-*Navigate to Plugins > Development > Import plugin from manifest...
-
-*Select the manifest.json file located in the root directory.
+* Open Figma Desktop App.
+* Navigate to Plugins > Development > Import plugin from manifest...
+* Select the manifest.json file located in the root directory.
 
 ## 🔮 Roadmap & Optimization
-API Integration: Refactor data generation to fetch live exchange rates via an external REST API.
-
-UI State Management: Implement state retention for user preferences (e.g., currency selection).
-
-Unit Testing: Implement Jest for testing utility functions.
+* API Integration: Refactor data generation to fetch live exchange rates via an external REST API.
+* UI State Management: Implement state retention for user preferences (e.g., currency selection).
+* Unit Testing: Implement Jest for testing utility functions.
