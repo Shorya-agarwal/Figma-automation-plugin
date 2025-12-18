@@ -5,33 +5,50 @@
 // the *figma document* via the figma global object.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
+// This runs in the Figma Sandbox
 
-// This shows the HTML page in "ui.html".
-figma.showUI(__html__);
+// 1. Show the UI 
+figma.showUI(__html__, { width: 300, height: 200 });
 
-// Calls to "parent.postMessage" from within the HTML page will trigger this
-// callback. The callback will be passed the "pluginMessage" property of the
-// posted message.
-figma.ui.onmessage =  (msg: {type: string, count: number}) => {
-  // One way of distinguishing between different types of messages sent from
-  // your HTML page is to use an object with a "type" property like this.
-  if (msg.type === 'create-shapes') {
-    // This plugin creates rectangles on the screen.
-    const numberOfRectangles = msg.count;
+// Helper function to generate random data
+function getRandomExpense() {
+  const merchants = ["Starbucks", "Uber", "Amazon AWS", "WeWork", "Apple Store", "Delta Airlines"];
+  const amounts = ["$4.50", "$24.99", "$120.00", "$9.99", "$2,400.00", "$450.00"];
+  
+  const randomMerchant = merchants[Math.floor(Math.random() * merchants.length)];
+  const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+  
+  return `${randomMerchant} - ${randomAmount}`;
+}
 
-    const nodes: SceneNode[] = [];
-    for (let i = 0; i < numberOfRectangles; i++) {
-      const rect = figma.createRectangle();
-      rect.x = i * 150;
-      rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
-      figma.currentPage.appendChild(rect);
-      nodes.push(rect);
-    }
-    figma.currentPage.selection = nodes;
-    figma.viewport.scrollAndZoomIntoView(nodes);
+// 2. Listen for messages from the UI
+figma.ui.onmessage = async (msg) => {
+
+  if (msg.type === 'create-expense') {
+    
+    // A. Load the font (REQUIRED step in Figma)
+    // We will use standard Inter font
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+
+    // B. Create the text node
+    const textNode = figma.createText();
+    
+    // C. Set the content
+    textNode.characters = getRandomExpense();
+    
+    // D. Style the text (optional, but looks nice)
+    textNode.fontSize = 24;
+    
+    // E. Position the text in the center of the user's current view
+    textNode.x = figma.viewport.center.x;
+    textNode.y = figma.viewport.center.y;
+
+    // F. Select the new node so the user sees it immediately
+    figma.currentPage.selection = [textNode];
+    
+    // Notify the user via a small toast message at the bottom
+    figma.notify("Expense added! 💸");
   }
 
-  // Make sure to close the plugin when you're done. Otherwise the plugin will
-  // keep running, which shows the cancel button at the bottom of the screen.
-  figma.closePlugin();
+  // Note: We are NOT calling figma.closePlugin() so the user can keep clicking.
 };

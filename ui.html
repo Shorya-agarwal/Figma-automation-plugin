@@ -1,17 +1,55 @@
-<h2>Rectangle Creator</h2>
-<p>Count: <input id="count" type="number" value="5"></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      padding: 20px;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+    button {
+      background-color: #18A0FB; /* Figma Blue */
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background-color: #0d8bdb;
+    }
+    .note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
 
-document.getElementById('create').onclick = () => {
-  const textbox = document.getElementById('count');
-  const count = parseInt(textbox.value, 10);
-  parent.postMessage({ pluginMessage: { type: 'create-shapes', count } }, '*')
-}
+  <h2>Expense Generator</h2>
+  <button id="create-btn">Add Random Expense</button>
+  <p class="note">Adds a text layer to the center of your view.</p>
 
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-}
-
-</script>
+  <script>
+    // This script runs in the UI popup
+    document.getElementById('create-btn').onclick = () => {
+      
+      // Send a message to the code.ts file (the sandbox)
+      parent.postMessage({ 
+        pluginMessage: { type: 'create-expense' } 
+      }, '*');
+      
+    }
+  </script>
+</body>
+</html>
